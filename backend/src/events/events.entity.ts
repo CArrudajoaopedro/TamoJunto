@@ -6,6 +6,14 @@ date: Date;
 capacity: number;
 organizerId: number;
 }
+export interface EventUpt {
+    title?: string;
+    description?: string;
+    location?: string;
+    date?: Date;
+    capacity?: number;
+    organizerId?: number;
+}
 export class Event {
 private _id: number;
 private _title: string;

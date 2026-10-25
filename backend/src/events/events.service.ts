@@ -1,13 +1,13 @@
 import * as eventsRepository from "./events.repository";
-import { Event, EventProps } from "./events.entity";
+import { Event, EventProps, EventUpt } from "./events.entity";
+import {AppError} from "../errors/AppError"
 export async function listAll() {
 return eventsRepository.findAll();
 }
 export async function getById(id: number) {
  const event = await eventsRepository.getById(id);
   if (!event) {
-   const error = new Error("Evento não encontrado.");
-   (error as any).statusCode = 404; // Código 404 para Not Found
+   const error: AppError = new AppError("Evento não encontrado.", 404, "NOT_FOUND");
    throw error; // Lançamos o erro para ser capturado no catch do Controller
  }
 
@@ -22,3 +22,12 @@ export async function create(props: EventProps) {
    // Salva no banco através do repositório
    return await eventsRepository.save(newEvent);
  }
+export async function update(id: number, data: EventUpt) {
+  const event: Event = eventsRepository.getById(id);
+  if (!event)
+  {
+    const error: AppError = new AppError("Evento não encontrado.", 404, "NOT_FOUND");
+    throw error;
+  }
+  return eventsRepository.update(id, data);
+}

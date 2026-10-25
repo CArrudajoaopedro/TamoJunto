@@ -1,5 +1,5 @@
 import { pool } from "../db";
-import { Event, EventProps } from "./events.entity";
+import { Event, EventProps, EventUpt } from "./events.entity";
 export async function findAll(){
     const result = await pool.query(`
         SELECT
@@ -51,7 +51,7 @@ export async function getById(event_id: number){
 
  return new Event(props, row.id, row.createdAt);
 }
-export async function  save(event: Event) {
+export async function save(event: Event) {
    const query = `
      INSERT INTO events (title, description, location, date, capacity, organizer_id, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)  RETURNING id;
    `;
@@ -86,3 +86,50 @@ export async function  save(event: Event) {
      event.createdAt
    );
  }
+export async function update(event_id: number, data: EventUpt) {
+  let update_query: string = `UPDATE events SET `;
+  console.log(data)
+  const update_values: Array<string | number | Date> = [];
+  if (data.title !== undefined)
+  {
+    update_query += `title = $${update_values.length + 1}`;
+    update_values.push(data.title);
+  }
+  if (data.description !== undefined)
+  {
+    if (update_values.length > 0) update_query += ","
+    update_query += ` description = $${update_values.length + 1}`;
+    update_values.push(data.description);
+  }
+  if (data.location !== undefined)
+  {
+    if (update_values.length > 0) update_query += ","
+    update_query += ` location = $${update_values.length + 1}`;
+    update_values.push(data.location);
+  }
+  if (data.date !== undefined)
+  {
+    if (update_values.length > 0) update_query += ","
+    update_query += ` date = $${update_values.length + 1}`;
+    update_values.push(data.date);
+  }
+  if (data.capacity !== undefined)
+  {
+    if (update_values.length > 0) update_query += ","
+    update_query += ` capacity = $${update_values.length + 1}`;
+    update_values.push(data.capacity);
+  }
+  if (data.organizerId !== undefined)
+  {
+    if (update_values.length > 0) update_query += ","
+    update_query += ` organizerId = $${update_values.length + 1}`;
+    update_values.push(data.organizerId);
+  }
+  if (update_values.length > 0)
+  {
+    update_query += ` WHERE id = $${update_values.length + 1}`;
+    update_values.push(event_id);
+    await pool.query(update_query, update_values);
+  }
+  return getById(event_id);
+}
