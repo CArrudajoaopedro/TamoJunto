@@ -1,11 +1,16 @@
 -- Limpar dados existentes (para poder rodar o seed repetidamente)
 TRUNCATE events, users RESTART IDENTITY CASCADE;
 
+--Carrega a biblioteca de criptogafia
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 -- Usuários
-INSERT INTO users (name, email) VALUES
-    ('Ana Silva',    'ana@email.com'),
-    ('Bruno Costa',  'bruno@email.com'),
-    ('Carla Souza',  'carla@email.com');
+INSERT INTO users (name, email, password) VALUES
+ ('Ana Silva', 'ana@email.com', crypt('ana123',
+gen_salt('bf'))),
+ ('Bruno Costa', 'bruno@email.com', crypt('bruno123',
+gen_salt('bf'))),
+ ('Carla Souza', 'carla@email.com', crypt('carla123',
+gen_salt('bf')));
 
 -- Eventos organizados pela Ana (id = 1)
 INSERT INTO events (title, description, location, date, capacity, organizer_id) VALUES

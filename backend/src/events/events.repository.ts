@@ -52,7 +52,7 @@ export async function getById(event_id: number){
  return new Event(props, row.id, row.createdAt);
 }
 export async function save(event: Event) {
-   const query = `
+  const query = `
      INSERT INTO events (title, description, location, date, capacity, organizer_id, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)  RETURNING id;
    `;
 
@@ -132,4 +132,8 @@ export async function update(event_id: number, data: EventUpt) {
     await pool.query(update_query, update_values);
   }
   return getById(event_id);
+}
+export async function remove(event_id: number) {
+  const query: string = `DELETE FROM events WHERE id = $1`;
+  await pool.query(query, [event_id]);
 }

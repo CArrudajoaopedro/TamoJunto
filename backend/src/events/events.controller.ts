@@ -1,8 +1,50 @@
 import { Request, Response, NextFunction } from "express";
 import * as eventsService from "./events.service";
-import { Event, EventProps } from "./events.entity";
+import { Event, EventProps, EventUpt } from "./events.entity";
 import {AppError} from "../errors/AppError"
 import {BadRequestError} from "../errors/BadRequestError"
+
+/**
+* @swagger
+* components:
+*   schemas:
+*     Event:
+*      type: object
+*      required:
+*       - title
+*       - location
+*       - date
+*       - capacity
+*       - organizerId
+*      properties:
+*        id:
+*         type: integer
+*         description: ID gerado automaticamente
+*        title:
+*         type: string
+*         description: Título do evento
+*        location:
+*         type: string
+*         description: Local do evento
+*        date:
+*         type: string
+*         description: Data do evento
+*         format: date-time
+*        capacity:
+*         type: integer
+*         description: Cpacidade do evento
+*        organizerId:
+*         type: integer
+*         description: Id do organizador do evento
+*      example:
+*      title: "Workshop de TypeScript"
+*      description: "Curso obrigatório de programação Web"
+*      location: "Auditório Central"
+*      date: "2026-11-20T19:00:00.000Z"
+*      capacity: 50
+*      organizerId: 1
+*/
+
 export async function getAll(req: Request, res: Response, next:
 NextFunction) {
 try {
@@ -110,7 +152,6 @@ export async function update(req: Request, res: Response, next: NextFunction) {
         throw new BadRequestError("Data inválida");
       }
     }
-    console.log(capacity)
     if (capacity)
     {
       capacity = Number(capacity);
@@ -150,5 +191,22 @@ export async function update(req: Request, res: Response, next: NextFunction) {
   catch (error: any)
   {
     next(error);
+  }
+}
+export async function remove(req: Request, res: Response, next: NextFunction) {
+  try
+  {
+    const eventId = Number(req.params.id);
+    if (isNaN(eventId)) {
+      const error: AppError = new AppError("ID do evento inválido. Deve ser um número.", 400, "BAD_REQUEST");
+      next(error);
+      return;
+    }
+    await eventsService.remove(eventId);
+    res.status(204).send();
+  }
+  catch (err)
+  {
+    next(err);
   }
 }
